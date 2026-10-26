@@ -14,7 +14,7 @@ html,body{width:100%;max-width:100%;overflow-x:hidden}main,header,section,.panel
 <article class="card"><h3>Prevención de accidentes con animales ponzoñosos</h3><p class="muted">ANLIS · Instituto Nacional de Producción de Biológicos</p><p>Recomendaciones oficiales para reducir riesgos con serpientes, arañas y escorpiones.</p><a href="https://www.argentina.gob.ar/salud/anlis/inpb/accidentes-con-animales-ponzonosos/como-prevenir-accidentes" target="_blank" rel="noopener noreferrer">Leer recomendaciones ↗</a></article>
 <article class="card"><h3>Georef: información territorial</h3><p class="muted">Estado nacional argentino</p><p>Información sobre provincias, departamentos, localidades y asentamientos.</p><a href="https://www.argentina.gob.ar/georef" target="_blank" rel="noopener noreferrer">Consultar Georef ↗</a></article>
 </div><div class="warning">Ante una mordedura o picadura potencialmente peligrosa, buscá atención médica urgente. Esta biblioteca no reemplaza indicaciones profesionales.</div></section>
-<section class="panel hidden" id="about"><h2>Sobre FaunaSantiago</h2><p>Aplicación educativa en desarrollo. La identificación por inteligencia artificial y la validación científica se incorporarán en próximas versiones.</p><p>Fuentes para verificar fichas: <a href="https://sib.gob.ar/">SIB</a>, <a href="https://www.gbif.org/">GBIF</a> e <a href="https://www.inaturalist.org/">iNaturalist</a>. Los registros requieren revisión de taxonomía, distribución y licencias.</p></section></main><footer>FaunaSantiago · Versión 0.8 · No reemplaza la identificación experta ni la atención médica.</footer>
+<section class="panel hidden" id="about"><h2>Sobre FaunaSantiago</h2><p>Aplicación educativa en desarrollo. La identificación por inteligencia artificial y la validación científica se incorporarán en próximas versiones.</p><p>Fuentes para verificar fichas: <a href="https://sib.gob.ar/">SIB</a>, <a href="https://www.gbif.org/">GBIF</a> e <a href="https://www.inaturalist.org/">iNaturalist</a>. Los registros requieren revisión de taxonomía, distribución y licencias.</p></section></main><footer>FaunaSantiago · Versión 0.9 · No reemplaza la identificación experta ni la atención médica.</footer>
 <script>
 const species=[['Yarará chica','Bothrops diporus','Serpientes','Venenosa'],['Yarará grande','Bothrops alternatus','Serpientes','Venenosa'],['Cascabel','Crotalus durissus','Serpientes','Venenosa'],['Coral verdadera','Micrurus pyrrhocryptus','Serpientes','Venenosa'],['Lagarto overo','Salvator merianae','Otros reptiles',''],['Escorpión','Tityus sp.','Escorpiones','Precaución'],['Araña','Latrodectus sp.','Arañas','Precaución'],['Hornero','Furnarius rufus','Aves',''],['Carancho','Caracara plancus','Aves',''],['Zorro gris','Lycalopex gymnocercus','Mamíferos',''],['Sapo común','Rhinella sp.','Anfibios','']];
 const $=id=>document.getElementById(id);const GEO='https://apis.datos.gob.ar/georef/api/v2.0/';
@@ -25,10 +25,14 @@ $('department').addEventListener('change',async()=>{let id=$('department').value
 $('locality').addEventListener('change',()=>{let other=$('locality').value==='other';$('otherLocality').classList.toggle('hidden',!other);$('otherLabel').classList.toggle('hidden',!other)});
 loadDepartments();const groups=[...new Set(species.map(x=>x[2]))];groups.forEach(g=>{let o=document.createElement('option');o.textContent=g;$('group').append(o)});
 function tab(id){['identify','catalog','history','library','about'].forEach(x=>$(x).classList.toggle('hidden',x!==id));if(id==='history')historyView();if(id==='catalog')catalog()}
+const verifiedPhotos={
+'Salvator merianae':{url:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Salvator_merianae.20120317.jpg?width=500',attribution:'Ceving',license:'CC BY-SA 4.0',source:'https://commons.wikimedia.org/wiki/File:Salvator_merianae.20120317.jpg'},
+'Furnarius rufus':{url:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Furnarius_rufus_(6221851328).jpg?width=500',attribution:'Donald Hobern',license:'CC BY 2.0',source:'https://commons.wikimedia.org/wiki/File:Furnarius_rufus_(6221851328).jpg'}
+};
 const taxonCache=new Map();
 async function addReferenceImage(d,s){
  const scientific=s[1],status=document.createElement('p');status.className='muted';status.textContent='Buscando fotografía de referencia…';d.prepend(status);
- let data=taxonCache.get(scientific);
+ let data=verifiedPhotos[scientific]||taxonCache.get(scientific);
  if(data===undefined){
   try{
    const url='https://api.inaturalist.org/v1/taxa?q='+encodeURIComponent(scientific)+'&per_page=30';
